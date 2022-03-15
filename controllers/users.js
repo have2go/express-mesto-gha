@@ -4,25 +4,33 @@ module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send({
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      _id: user._id,
+    }))
     .catch(
       (err) => {
-        if (err.name === 'ValidationError') {
-          res.status(400).send({ message: err.message });
-        } else {
-          res.status(500).send({ message: err.message });
-        }
+        res.status(400).send({ message: err.message });
       },
     );
 };
 
 module.exports.getUser = (req, res) => {
-  User.findById(req.user._id)
+  User.findById(req.params.userId)
     .orFail(new Error('NotValid'))
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send({
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      _id: user._id,
+    }))
     .catch((err) => {
       if (err.message === 'NotValid') {
-        res.status(404).send({ message: 'Нет пользователя с таким id' });
+        res.status(404).send({ message: 'Пользователь по указанному _id не найден' });
+      } else if (err.name === 'CastError' || err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Переданы некорректные данные пользователя' });
       } else {
         res.status(500).send({ message: err.message });
       }
@@ -50,14 +58,16 @@ module.exports.updateUser = (req, res) => {
     },
   )
     .orFail(new Error('NotValid'))
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send({
+      name: user.name,
+      about: user.about,
+      _id: user._id,
+    }))
     .catch((err) => {
       if (err.message === 'NotValid') {
-        res.status(404).send({ message: 'Нет пользователя с таким id' });
-      } else if (err.name === 'ValidationError') {
-        res.status(400).send({ message: err.message });
+        res.status(404).send({ message: 'Пользователь по указанному _id не найден' });
       } else {
-        res.status(500).send({ message: err.message });
+        res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля' });
       }
     });
 };
@@ -76,14 +86,15 @@ module.exports.updateUserAvatar = (req, res) => {
     },
   )
     .orFail(new Error('NotValid'))
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send({
+      avatar: user.avatar,
+      _id: user._id,
+    }))
     .catch((err) => {
       if (err.message === 'NotValid') {
-        res.status(404).send({ message: 'Нет пользователя с таким id' });
-      } else if (err.name === 'ValidationError') {
-        res.status(400).send({ message: err.message });
+        res.status(404).send({ message: 'Пользователь по указанному _id не найден' });
       } else {
-        res.status(500).send({ message: err.message });
+        res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля' });
       }
     });
 };
