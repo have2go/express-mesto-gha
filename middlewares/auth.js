@@ -16,7 +16,7 @@ module.exports = (req, res, next) => {
     next();
   } catch (err) {
     res
-      .status(403)
+      .status(401)
       .send({ message: 'Вы не авторизованы' });
   }
 };

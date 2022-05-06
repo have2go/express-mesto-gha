@@ -1,4 +1,6 @@
 const cards = require('express').Router();
+const { celebrate, Joi } = require('celebrate');
+const validator = require('validator');
 
 const {
   getAllCards,
@@ -9,9 +11,40 @@ const {
 } = require('../controllers/cards');
 
 cards.get('/cards', getAllCards);
-cards.post('/cards', createCard);
-cards.delete('/cards/:cardId', deleteCard);
-cards.put('/cards/:cardId/likes', likeCard);
-cards.delete('/cards/:cardId/likes', dislikeCard);
+
+cards.post('/cards', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    link: Joi.string()
+      .required()
+      .custom((value, helpers) => {
+        if (validator.isURL(value)) {
+          return value;
+        }
+        return helpers.message('Заполните поле валидным URL');
+      })
+      .message({
+        'string.required': 'Поле должны быть заполнено',
+      }),
+  }),
+}), createCard);
+
+cards.delete('/cards/:cardId', celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().alphanum().length(24),
+  }),
+}), deleteCard);
+
+cards.put('/cards/:cardId/likes', celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().alphanum().length(24),
+  }),
+}), likeCard);
+
+cards.delete('/cards/:cardId/likes', celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().alphanum().length(24),
+  }),
+}), dislikeCard);
 
 module.exports = cards;
