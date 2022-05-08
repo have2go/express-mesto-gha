@@ -1,7 +1,7 @@
 const Card = require('../models/card');
 const BadRequestError = require('../errors/400-bad-req');
-const UnauthorizedError = require('../errors/401-unauth');
 const NotFoundError = require('../errors/404-notfound');
+const ForbiddenError = require('../errors/403-forbidden');
 
 module.exports.getAllCards = (req, res, next) => {
   Card.find({})
@@ -9,7 +9,7 @@ module.exports.getAllCards = (req, res, next) => {
       if (cards.length >= 1) {
         res.send(cards);
       } else {
-        throw new NotFoundError({ message: 'Карточки не найдены' });
+        throw new NotFoundError('Карточки не найдены');
       }
     })
     .catch(next);
@@ -29,7 +29,7 @@ module.exports.createCard = (req, res, next) => {
     }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError({ message: 'Переданы некорректные данные при создании карточки' }));
+        next(new BadRequestError('Переданы некорректные данные при создании карточки'));
       }
       next(err);
     });
@@ -40,11 +40,11 @@ module.exports.deleteCard = (req, res, next) => {
 
   Card.findById(req.params.cardId)
     .orFail(() => {
-      throw new NotFoundError({ message: 'Карточка с указанным _id не найдена' });
+      throw new NotFoundError('Карточка не найдена');
     })
     .then((card) => {
       if (userId !== card.owner.toString()) {
-        throw new UnauthorizedError({ message: 'Вы не можете удалять чужие карточки' });
+        throw new ForbiddenError('Вы не можете удалять чужие карточки');
       }
 
       Card.findByIdAndRemove(req.params.cardId)
@@ -62,7 +62,7 @@ module.exports.deleteCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError({ message: 'Переданы некорректные данные при удалении карточки' }));
+        next(new BadRequestError('Переданы некорректные данные при удалении карточки'));
       }
       next(err);
     });
@@ -85,12 +85,12 @@ module.exports.likeCard = (req, res, next) => {
           createdAt: card.createdAt,
         });
       } else {
-        throw new NotFoundError({ message: 'Карточка с указанным _id не найдена' });
+        throw new NotFoundError('Карточка с указанным _id не найдена');
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError({ message: 'Переданы некорректные данные при постановке лайка' }));
+        next(new BadRequestError('Переданы некорректные данные при постановке лайка'));
       }
       next(err);
     });
@@ -113,12 +113,12 @@ module.exports.dislikeCard = (req, res, next) => {
           createdAt: card.createdAt,
         });
       } else {
-        throw new NotFoundError({ message: 'Карточка с указанным _id не найдена' });
+        throw new NotFoundError('Карточка с указанным _id не найдена');
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError({ message: 'Переданы некорректные данные при постановке лайка' }));
+        next(new BadRequestError('Переданы некорректные данные при постановке лайка'));
       }
       next(err);
     });

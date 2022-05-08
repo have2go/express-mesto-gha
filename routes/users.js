@@ -35,7 +35,7 @@ users.patch('/users/me/avatar', celebrate({
         if (validator.isURL(value)) {
           return value;
         }
-        return helpers.message('Заполните поле валидным URL');
+        return helpers.message('Заполните поле корректным URL');
       })
       .message({
         'string.required': 'Поле должны быть заполнено',

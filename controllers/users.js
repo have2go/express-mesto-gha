@@ -26,7 +26,7 @@ module.exports.createUser = (req, res, next) => {
     }))
     .catch((err) => {
       if (err.code === 11000) {
-        next(new ConflictError({ message: 'Пользователь уже существует' }));
+        next(new ConflictError('Пользователь уже существует'));
       }
       next(err);
     });
@@ -43,12 +43,12 @@ module.exports.getUser = (req, res, next) => {
           _id: user._id,
         });
       } else {
-        throw new NotFoundError({ message: 'Пользователь с указанным _id не найден' });
+        throw new NotFoundError('Пользователь с указанным _id не найден');
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError({ message: 'Переданы некорректные данные' }));
+        next(new BadRequestError('Переданы некорректные данные'));
       }
       next(err);
     });
@@ -60,7 +60,7 @@ module.exports.getAllUsers = (req, res, next) => {
       if (users.length >= 1) {
         res.send({ data: users });
       } else {
-        throw new NotFoundError({ message: 'Пользователи не найдены' });
+        throw new NotFoundError('Пользователи не найдены');
       }
     })
     .catch(next);
@@ -96,12 +96,12 @@ module.exports.updateUser = (req, res, next) => {
           _id: user._id,
         });
       } else {
-        throw new NotFoundError({ message: 'Пользователь не найден' });
+        throw new NotFoundError('Пользователь не найден');
       }
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        next(new BadRequestError({ message: 'Переданы некорректные данные при обновлении пользователя' }));
+        next(new BadRequestError('Переданы некорректные данные при обновлении пользователя'));
       }
       next(err);
     });
@@ -127,12 +127,12 @@ module.exports.updateUserAvatar = (req, res, next) => {
           _id: user._id,
         });
       } else {
-        throw new NotFoundError({ message: 'Пользователь не найден' });
+        throw new NotFoundError('Пользователь не найден');
       }
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        next(new BadRequestError({ message: 'Переданы некорректные данные при обновлении аватара' }));
+        next(new BadRequestError('Переданы некорректные данные при обновлении аватара'));
       }
       next(err);
     });

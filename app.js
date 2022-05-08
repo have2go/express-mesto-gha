@@ -29,17 +29,26 @@ app.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string(),
+    avatar: Joi.string()
+      .pattern(
+        /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\\+~#=]+\.[a-zA-Z0-9()]+([-a-zA-Z0-9()@:%_\\+.~#?&/=#]*)/,
+      ),
     email: Joi.string().required().email(),
     password: Joi.string().required().min(2),
   }),
 }), createUser);
 app.use('/', auth, usersRoute);
 app.use('/', auth, cardsRoute);
-app.use(errors());
 
 app.all('*', () => {
-  throw new NotFoundError({ message: 'Ошибка 404. Страница не найдена' });
+  throw new NotFoundError('Ошибка 404. Страница не найдена');
+});
+
+app.use(errors());
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  res.status(statusCode).send({ message: statusCode === 500 ? 'Ошибка сервера' : message });
+  next(err);
 });
 
 app.listen(PORT, () => {
