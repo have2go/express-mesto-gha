@@ -56,13 +56,7 @@ module.exports.getUser = (req, res, next) => {
 
 module.exports.getAllUsers = (req, res, next) => {
   User.find({})
-    .then((users) => {
-      if (users.length >= 1) {
-        res.send({ data: users });
-      } else {
-        throw new NotFoundError('Пользователи не найдены');
-      }
-    })
+    .then((users) => res.send({ data: users }))
     .catch(next);
 };
 

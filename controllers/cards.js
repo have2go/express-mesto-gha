@@ -5,13 +5,7 @@ const ForbiddenError = require('../errors/403-forbidden');
 
 module.exports.getAllCards = (req, res, next) => {
   Card.find({})
-    .then((cards) => {
-      if (cards.length >= 1) {
-        res.send(cards);
-      } else {
-        throw new NotFoundError('Карточки не найдены');
-      }
-    })
+    .then((cards) => res.send(cards))
     .catch(next);
 };
 
